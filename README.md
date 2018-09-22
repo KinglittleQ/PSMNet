@@ -2,7 +2,7 @@
 
 Pytorch reimplementation of PSM-Net: "[Pyramid Stereo Matching Network](https://arxiv.org/abs/1803.08669)" paper (CVPR 2018) by Jia-Ren Chang and Yong-Sheng Chen.
 
-Official code: [JiaRenChang/PSMNet](JiaRenChang/PSMNet)
+Official code: [JiaRenChang/PSMNet](https://github.com/JiaRenChang/PSMNet)
 
 ![model](pic/model.png)
 
