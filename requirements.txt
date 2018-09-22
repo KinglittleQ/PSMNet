@@ -1,0 +1,6 @@
+opencv_contrib_python_headless==3.4.3.18
+torchvision==0.2.1
+torch==0.4.0
+matplotlib==2.2.2
+numpy==1.14.3
+tensorboardX==1.4
