@@ -2,7 +2,7 @@
 
 Pytorch reimplementation of PSM-Net: "[Pyramid Stereo Matching Network](https://arxiv.org/abs/1803.08669)" paper (CVPR 2018) by Jia-Ren Chang and Yong-Sheng Chen.
 
-Official code: [JiaRenChang/PSMNet](https://github.com/JiaRenChang/PSMNet)
+Official repository: [JiaRenChang/PSMNet](https://github.com/JiaRenChang/PSMNet)
 
 ![model](pic/model.png)
 
@@ -62,26 +62,39 @@ optional arguments:
 For example:
 
 ``` shell
-python train.py --batch-size 16 --logdir log/exmaple
+python train.py --batch-size 16 \
+                --logdir log/exmaple \
+                --num-epochs 500
 ```
 
 ### 3) Virsualize result
 
-This repository use tensorboardX to virsualize training result. Find your log directory and launch tensorboard to look over the result. The default log directory is `/log`
+This repository uses tensorboardX to virsualize training result. Find your log directory and launch tensorboard to look over the result. The default log directory is `/log`
 
 ``` shell
 tensorboard --logdir <your_log_dir>
 ```
 
-Here are some of my training result (not pretty good yet, just training for 100+ epochs):
+Here are some of my training results (have been trained for 1000 epochs on KITTI2015):
 
-![disp](pic/disp.png)
+![disp](pic/01.png)
 
-![left](pic/left.png)
+![left](pic/02.png)
 
 ![loss](pic/loss.png)
 
 ![error](pic/error3px.png)
+
+### 4) Pretrained model
+
+A model trained for 1000 epochs on KITTI2015 dataset can be download [here](https://drive.google.com/open?id=1JW330o2UGQi6XGB4o3pD_MdGttYwiZdv). (I choose the best model among the 1000 epochs)
+
+```
+state {
+    'epoch': 857,
+    '3px-error': 3.466
+}
+```
 
 ## Task List
 
@@ -90,7 +103,7 @@ Here are some of my training result (not pretty good yet, just training for 100+
 - [x] KITTI2015 dataset
 - [ ] Scene Flow dataset
 - [x] Virsualize
-- [ ] Pretained model
+- [x] Pretained model
 
 ## Contact
 
