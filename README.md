@@ -23,6 +23,8 @@ All dependencies are in `requirements.txt`, you can follow below command to inst
 pip install requirements.txt
 ```
 
+
+
 ### 2) Train
 
 ``` shell
@@ -67,6 +69,8 @@ python train.py --batch-size 16 \
                 --num-epochs 500
 ```
 
+
+
 ### 3) Virsualize result
 
 This repository uses tensorboardX to virsualize training result. Find your log directory and launch tensorboard to look over the result. The default log directory is `/log`
@@ -85,7 +89,39 @@ Here are some of my training results (have been trained for 1000 epochs on KITTI
 
 ![error](pic/error3px.png)
 
-### 4) Pretrained model
+
+
+### 4) Inference
+
+``` shell
+usage: inference.py [-h] [--maxdisp MAXDISP] [--left LEFT] [--right RIGHT]
+                    [--model-path MODEL_PATH] [--save-path SAVE_PATH]
+
+PSMNet inference
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --maxdisp MAXDISP     max diparity
+  --left LEFT           path to the left image
+  --right RIGHT         path to the right image
+  --model-path MODEL_PATH
+                        path to the model
+  --save-path SAVE_PATH
+                        path to save the disp image
+```
+
+For example:
+
+``` shell
+python inference.py --left test/left.png \
+                    --right test/right.png \
+                    --model-path checkpoint/08/best_model.ckpt \
+                    --save-path test/disp.png
+```
+
+
+
+### 5) Pretrained model
 
 A model trained for 1000 epochs on KITTI2015 dataset can be download [here](https://drive.google.com/open?id=1JW330o2UGQi6XGB4o3pD_MdGttYwiZdv). (I choose the best model among the 1000 epochs)
 
@@ -99,7 +135,7 @@ state {
 ## Task List
 
 - [x] Train
-- [ ] Test
+- [x] Inference
 - [x] KITTI2015 dataset
 - [ ] Scene Flow dataset
 - [x] Virsualize
