@@ -57,6 +57,7 @@ def main():
     plt.figure(figsize=(12.84, 3.84))
     plt.axis('off')
     plt.imshow(disp)
+    plt.colorbar()
     plt.savefig(args.save_path, dpi=100)
 
     print('save diparity map in {}'.format(args.save_path))
