@@ -133,7 +133,8 @@ def save_image(left_image, disp, epoch):
     # left_image = torch.from_numpy(left_image.cpu().numpy()[::-1])
 
     disp_img = disp.detach().cpu().numpy()
-    fig = plt.figure()
+    fig = plt.figure(12.84, 3.84)
+    plt.axis('off')  # hide axis
     plt.imshow(disp_img)
     plt.colorbar()
 
