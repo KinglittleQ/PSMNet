@@ -1,5 +1,6 @@
 import argparse
 import os
+import shutil
 import numpy as np
 
 import torch
@@ -28,9 +29,10 @@ parser.add_argument('--validate-batch-size', type=int, default=2, help='batch si
 parser.add_argument('--log-per-step', type=int, default=1, help='log per step')
 parser.add_argument('--save-per-epoch', type=int, default=1, help='save model per epoch')
 parser.add_argument('--model-dir', default='checkpoint', help='directory where save model checkpoint')
+parser.add_argument('--model-path', default=None, help='path of model to load')
+# parser.add_argument('--start-step', type=int, default=0, help='number of steps at starting')
 parser.add_argument('--lr', type=float, default=0.001, help='learning rate')
 parser.add_argument('--num-epochs', type=int, default=300, help='number of training epochs')
-
 parser.add_argument('--num-workers', type=int, default=8, help='num workers in loading data')
 # parser.add_argument('--')
 
@@ -46,6 +48,7 @@ writer = tX.SummaryWriter(log_dir=args.logdir, comment='FSMNet')
 device = torch.device('cuda')
 print(device)
 
+
 def main(args):
 
     train_transform = T.Compose([RandomCrop([256, 512]), Normalize(mean, std), ToTensor()])
@@ -56,15 +59,23 @@ def main(args):
     validate_dataset = KITTI2015(args.datadir, mode='validate', transform=validate_transform)
     validate_loader = DataLoader(validate_dataset, batch_size=args.validate_batch_size, num_workers=args.num_workers)
 
+    step = 0
+    best_error = 100.0
+
     model = PSMNet(args.maxdisp).to(device)
     model = nn.DataParallel(model, device_ids=device_ids)
-
-    print('Number of model parameters: {}'.format(sum([p.data.nelement() for p in model.parameters()])))
-    
     criterion = SmoothL1Loss().to(device)
     optimizer = optim.Adam(model.parameters(), lr=args.lr)
 
-    step = 0
+    if args.model_path is not None:
+        state = torch.load(args.model_path)
+        model.load_state_dict(state['state_dict'])
+        optimizer.load_state_dict(state['optimizer'])
+        step = state['step']
+        best_error = state['error']
+        print('load model from {}'.format(args.model_path))
+
+    print('Number of model parameters: {}'.format(sum([p.data.nelement() for p in model.parameters()])))
 
     for epoch in range(1, args.num_epochs + 1):
         model.train()
@@ -72,10 +83,9 @@ def main(args):
         adjust_lr(optimizer, epoch)
 
         if epoch % args.save_per_epoch == 0:
-            save(model, epoch)
-
-        model.eval()
-        validate(model, validate_loader, epoch)
+            model.eval()
+            error = validate(model, validate_loader, epoch)
+            best_error = save(model, optimizer, epoch, step, error, best_error)
 
 
 def validate(model, validate_loader, epoch):
@@ -98,14 +108,10 @@ def validate(model, validate_loader, epoch):
             _, _, disp = model(left_img, right_img)
 
         delta = torch.abs(disp[mask] - target_disp[mask])
-            # target_disp = target_disp.detach_().clone().cpu().numpy()
-        # error = np.sum(np.logical_and(delta > 3.0, delta > 0.05 * target_disp[mask])) / torch.numel(disp[mask]) * 100
-
         error_mat = (((delta >= 3.0) + (delta >= 0.05 * (target_disp[mask]))) == 2)
         error = torch.sum(error_mat).item() / torch.numel(disp[mask]) * 100
 
         avg_error += error
-
         if i == idx:
             left_save = left_img
             disp_save = disp
@@ -114,6 +120,8 @@ def validate(model, validate_loader, epoch):
     print('epoch: {:03} | 3px-error: {:.5}%'.format(epoch, avg_error))
     writer.add_scalar('error/3px', avg_error, epoch)
     save_image(left_save[0], disp_save[0], epoch)
+
+    return avg_error
 
 
 def save_image(left_image, disp, epoch):
@@ -126,7 +134,8 @@ def save_image(left_image, disp, epoch):
 
     disp_img = disp.detach().cpu().numpy()
     fig = plt.figure()
-    plt.imshow(disp_img, cmap='hot')
+    plt.imshow(disp_img)
+    plt.colorbar()
 
     writer.add_figure('image/disp', fig, global_step=epoch)
     writer.add_image('image/left', left_image, global_step=epoch)
@@ -146,7 +155,6 @@ def train(model, train_loader, optimizer, criterion, step):
 
         mask = (target_disp > 0)
         mask = mask.detach_()
-
 
         disp1, disp2, disp3 = model(left_img, right_img)
         loss1, loss2, loss3 = criterion(disp1[mask], disp2[mask], disp3[mask], target_disp[mask])
@@ -174,11 +182,28 @@ def adjust_lr(optimizer, epoch):
             param_group['lr'] = lr
 
 
-
-def save(model, epoch):
+def save(model, optimizer, epoch, step, error, best_error):
     path = os.path.join(args.model_dir, '{:03}.ckpt'.format(epoch))
-    torch.save(model.state_dict(), path)
+    # torch.save(model.state_dict(), path)
+    # model.save_state_dict(path)
+
+    state = {}
+    state['state_dict'] = model.state_dict()
+    state['optimizer'] = optimizer.state_dict()
+    state['error'] = error
+    state['epoch'] = epoch
+    state['step'] = step
+
+    torch.save(state, path)
     print('save model at epoch{}'.format(epoch))
+
+    if error < best_error:
+        best_error = error
+        best_path = os.path.join(args.model_dir, 'best_model.ckpt'.format(epoch))
+        shutil.copyfile(path, best_path)
+        print('best model in epoch {}'.format(epoch))
+
+    return best_error
 
 
 if __name__ == '__main__':
