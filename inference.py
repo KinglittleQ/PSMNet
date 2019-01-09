@@ -25,7 +25,7 @@ args = parser.parse_args()
 mean = [0.406, 0.456, 0.485]
 std = [0.225, 0.224, 0.229]
 device_ids = [0, 1, 2, 3]
-device = 'cuda'
+device = torch.device('cuda:{}'.format(device_ids[0]))
 
 
 def main():
@@ -40,9 +40,18 @@ def main():
     right = pairs['right'].to(device).unsqueeze(0)
 
     model = PSMNet(args.maxdisp).to(device)
-    model = nn.DataParallel(model, device_ids=device_ids)
+    if len(device_ids) > 1:
+        model = nn.DataParallel(model, device_ids=device_ids)
 
     state = torch.load(args.model_path)
+    if len(device_ids) == 1:
+        from collections import OrderedDict
+        new_state_dict = OrderedDict()
+        for k, v in state['state_dict'].items():
+            namekey = k[7:] # remove `module.`
+            new_state_dict[namekey] = v
+        state['state_dict'] = new_state_dict
+
     model.load_state_dict(state['state_dict'])
     print('load model from {}'.format(args.model_path))
     print('epoch: {}'.format(state['epoch']))
