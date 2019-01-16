@@ -71,7 +71,7 @@ python train.py --batch-size 16 \
 
 
 
-### 3) Virsualize result
+### 3) Visualize result
 
 This repository uses tensorboardX to virsualize training result. Find your log directory and launch tensorboard to look over the result. The default log directory is `/log`
 
