@@ -138,7 +138,7 @@ state {
 - [x] Inference
 - [x] KITTI2015 dataset
 - [ ] Scene Flow dataset
-- [x] Virsualize
+- [x] Visualize
 - [x] Pretained model
 
 ## Contact
