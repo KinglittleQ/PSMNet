@@ -17,7 +17,7 @@ Official repository: [JiaRenChang/PSMNet](https://github.com/JiaRenChang/PSMNet)
 - TensorboardX
 - Tensorboard
 
-All dependencies are in `requirements.txt`, you can follow below command to install dependencies.
+All dependencies are listed in `requirements.txt`, you execute below command to install the dependencies.
 
 ``` shell
 pip install -r requirements.txt
@@ -73,7 +73,7 @@ python train.py --batch-size 16 \
 
 ### 3) Visualize result
 
-This repository uses tensorboardX to virsualize training result. Find your log directory and launch tensorboard to look over the result. The default log directory is `/log`
+This repository uses tensorboardX to visualize training result. Find your log directory and launch tensorboard to look over the result. The default log directory is `/log`.
 
 ``` shell
 tensorboard --logdir <your_log_dir>
@@ -123,7 +123,7 @@ python inference.py --left test/left.png \
 
 ### 5) Pretrained model
 
-A model trained for 1000 epochs on KITTI2015 dataset can be download [here](https://drive.google.com/open?id=1JW330o2UGQi6XGB4o3pD_MdGttYwiZdv). (I choose the best model among the 1000 epochs)
+A model trained for 1000 epochs on [KITTI2015](http://www.cvlibs.net/datasets/kitti/eval_scene_flow.php?benchmark=stereo) dataset can be download [here](https://drive.google.com/open?id=1JW330o2UGQi6XGB4o3pD_MdGttYwiZdv). (I choose the best model among the 1000 epochs)
 
 ```
 state {
@@ -145,5 +145,5 @@ state {
 
 Email: checkdeng0903@gmail.com
 
-Wellcome for any discussions! 
+Welcome for any discussions! 
 
