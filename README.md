@@ -20,7 +20,7 @@ Official repository: [JiaRenChang/PSMNet](https://github.com/JiaRenChang/PSMNet)
 All dependencies are in `requirements.txt`, you can follow below command to install dependencies.
 
 ``` shell
-pip install requirements.txt
+pip install -r requirements.txt
 ```
 
 
