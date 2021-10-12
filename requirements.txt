@@ -1,4 +1,4 @@
-opencv_contrib_python_headless==3.4.3.18
+opencv_contrib_python_headless==4.1.2.30
 torchvision==0.2.1
 torch==0.4.0
 matplotlib==2.2.2
