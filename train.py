@@ -68,7 +68,7 @@ def main(args):
     optimizer = optim.Adam(model.parameters(), lr=args.lr)
 
     if args.model_path is not None:
-        state = torch.load(args.model_path)
+        state = torch.load(args.model_path, weights_only=True)
         model.load_state_dict(state['state_dict'])
         optimizer.load_state_dict(state['optimizer'])
         step = state['step']
